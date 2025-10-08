@@ -1,0 +1,3 @@
+# Best-effort pinned dependencies (update locally with `.venv` active via `pip freeze > requirements.txt`)
+pandas==2.2.3
+requests==2.31.0
