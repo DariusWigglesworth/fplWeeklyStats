@@ -1,4 +1,6 @@
 import requests
+import json
+from pathlib import Path
 import pandas as pd
 
 # Magic number conversion (Alhpabetical order)
@@ -50,9 +52,26 @@ teamStats = [
 ]
 
 matchweek = 8 # Set to current week
+matchweekURL = "https://fantasy.premierleague.com/api/fixtures/?event=" + str(matchweek)
 
-response = requests.get("https://fantasy.premierleague.com/api/fixtures/?event=" + str(matchweek))
+# Check if data.json exists and is up to date
+path = Path("data.json")
+if not path.is_file():
+    response = requests.get(matchweekURL)
+    data = response.json()
+    path.write_text(json.dumps(data), encoding="utf-8")
+else:
+    with open(path, 'r') as file:
+        data = json.load(file)
+        if data[0]["event"] != matchweek:
+            response = requests.get(matchweekURL)
+            data = response.json()
+            path.write_text(json.dumps(data), encoding="utf-8")
+
 
 columns = ["Team", "Home/Away", "xG", "xGA", "Opponent"]
-
 df = pd.DataFrame(columns=columns)
+
+with open("data.json", 'r') as file:
+    data = json.load(file)
+    for match in data:
