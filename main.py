@@ -5,26 +5,26 @@ import pandas as pd
 
 # Magic number conversion (Alhpabetical order)
 teamIndexes = {
-    "Arsenal" : 1,
-    "Aston Villa" : 2,
-    "Bournemouth" : 3,
-    "Brentford" : 4,
-    "Brighton" : 5,
-    "Burnley" : 6,
-    "Chelsea" : 7,
-    "Crystal Palace" : 8,
-    "Everton" : 9,
-    "Fulham" : 10,
-    "Leeds" : 11,
-    "Liverpool" : 12,
-    "Manchester City" : 13,
-    "Manchester United" : 14,
-    "Newcastle" : 15,
-    "Nottingham Forest" : 16,
-    "Sunderland" : 17,
-    "Tottenham" : 18,
-    "Wolves" : 19,
-    "West Ham" : 20
+    1 : "Arsenal",
+    2 : "Aston Villa",
+    3 : "Bournemouth",
+    4 : "Brentford",
+    5 : "Brighton",
+    6 : "Burnley",
+    7 : "Chelsea",
+    8 : "Crystal Palace",
+    9 : "Everton",
+    10 : "Fulham",
+    11 : "Leeds",
+    12 : "Liverpool",
+    13 : "Manchester City",
+    14 : "Manchester United",
+    15 : "Newcastle",
+    16 : "Nottingham Forest",
+    17 : "Sunderland",
+    18 : "Tottenham",
+    19 : "Wolves",
+    20 : "West Ham"
 }
 
 # expected goals (Home), expected goals against (Home), expected goals (Away), expected goals against (Away)
@@ -52,6 +52,9 @@ teamStats = [
 ]
 
 matchweek = 8 # Set to current week
+
+# See following URL for info on FPL API:
+# https://medium.com/@mark_74548/how-to-extract-and-process-data-from-the-fpl-api-e5d95ecd7a84
 matchweekURL = "https://fantasy.premierleague.com/api/fixtures/?event=" + str(matchweek)
 
 # Check if data.json exists and is up to date
@@ -75,3 +78,13 @@ df = pd.DataFrame(columns=columns)
 with open("data.json", 'r') as file:
     data = json.load(file)
     for match in data:
+        homeTeam = teamIndexes[match["team_h"]]
+        awayTeam = teamIndexes[match["team_a"]]
+        homeTeamStats = teamStats[match["team_h"] - 1]
+        awayTeamStats = teamStats[match["team_a"] - 1]
+
+        df = pd.concat([df, pd.DataFrame([[homeTeam, "Home", homeTeamStats["xG (H)"], homeTeamStats["xGA (H)"], awayTeam]], columns=columns)], ignore_index=True)
+        df = pd.concat([df, pd.DataFrame([[awayTeam, "Away", awayTeamStats["xG (H)"], awayTeamStats["xGA (H)"], homeTeam]], columns=columns)], ignore_index=True)
+
+
+print(df)
