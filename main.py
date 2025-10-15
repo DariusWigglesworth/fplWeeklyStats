@@ -72,7 +72,7 @@ else:
             path.write_text(json.dumps(data), encoding="utf-8")
 
 
-columns = ["Team", "Home/Away", "xG", "xGA", "Opponent"]
+columns = ["Team", "Home/Away", "xG/90", "xGA/90", "Opponent"]
 df = pd.DataFrame(columns=columns)
 
 with open("data.json", 'r') as file:
@@ -83,8 +83,13 @@ with open("data.json", 'r') as file:
         homeTeamStats = teamStats[match["team_h"] - 1]
         awayTeamStats = teamStats[match["team_a"] - 1]
 
-        df = pd.concat([df, pd.DataFrame([[homeTeam, "Home", homeTeamStats["xG (H)"], homeTeamStats["xGA (H)"], awayTeam]], columns=columns)], ignore_index=True)
-        df = pd.concat([df, pd.DataFrame([[awayTeam, "Away", awayTeamStats["xG (H)"], awayTeamStats["xGA (H)"], homeTeam]], columns=columns)], ignore_index=True)
+        homePer90xG = round(homeTeamStats["xG (H)"] / homeTeamStats["Games (H)"], 2)
+        homePer90xGA = round(homeTeamStats["xGA (H)"] / homeTeamStats["Games (H)"], 2)
+        awayPer90xG = round(awayTeamStats["xG (A)"] / awayTeamStats["Games (A)"], 2)
+        awayPer90xGA = round(awayTeamStats["xGA (A)"] / awayTeamStats["Games (A)"], 2)
+
+        df = pd.concat([df, pd.DataFrame([[homeTeam, "Home", homePer90xG, homePer90xGA, awayTeam]], columns=columns)], ignore_index=True)
+        df = pd.concat([df, pd.DataFrame([[awayTeam, "Away", awayPer90xG, awayPer90xGA, homeTeam]], columns=columns)], ignore_index=True)
 
 
 print(df)
